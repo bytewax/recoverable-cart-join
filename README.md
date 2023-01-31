@@ -6,7 +6,7 @@
     
 - Time to complete
     
-    **Approx. 25 min**
+    **Approx. 15 min**
     
 ### Introduction
 
