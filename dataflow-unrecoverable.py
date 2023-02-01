@@ -1,4 +1,7 @@
+import json
+
 from bytewax.dataflow import Dataflow
+from bytewax.inputs import ManualInputConfig
 from bytewax.outputs import ManualOutputConfig
 from bytewax.execution import run_main
 

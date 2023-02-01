@@ -30,7 +30,7 @@ FAIL HERE
 ```
 
 **Python modules**
-bytewax
+bytewax==0.15.0
 
 ## Your Takeaway
 

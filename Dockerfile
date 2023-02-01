@@ -1,1 +1,5 @@
-FROM python:3.9-slim
+FROM bytewax/bytewax:latest-python3.10
+
+pip install requirements.txt
+
+COPY . .
