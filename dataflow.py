@@ -70,5 +70,5 @@ flow.stateful_map("joiner", build_state, joiner)
 flow.map(format_output)
 flow.capture(ManualOutputConfig(output_builder))
 
-if __name__ == main:
+if __name__ == "__main__":
   run_main(flow, recovery_config=recovery_config, epoch_config=TestingEpochConfig())
