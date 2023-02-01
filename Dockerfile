@@ -1,5 +1,9 @@
 FROM bytewax/bytewax:latest-python3.10
 
-pip install requirements.txt
+ENV PYTHONUNBUFFERED 1
 
 COPY . .
+
+RUN pip install -r requirements.txt
+
+ENTRYPOINT ["python", "dataflow.py"]
