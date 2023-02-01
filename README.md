@@ -2,7 +2,7 @@
 
 - Skill level
     
-    **Advanced, no prior knowledge requirements**
+    **Intermediate, Some prior knowledge required**
     
 - Time to complete
     
