@@ -1,17 +1,37 @@
 import json
 
+from pathlib import Path
+from datetime import timedelta
+
+from bytewax.inputs import DynamicInput, StatelessSource
 from bytewax.dataflow import Dataflow
-from bytewax.inputs import ManualInputConfig
-from bytewax.outputs import ManualOutputConfig
+from bytewax.connectors.stdio import StdOutput
 from bytewax.execution import run_main
 
-def input_builder(worker_index, worker_count, resume_state):
-    assert worker_index == 0  # We're not going to worry about multiple workers yet.
-    with open("data/cart-join.json") as f:
-        for i, line in enumerate(f):
-            obj = json.loads(line)
-            yield i, obj
-            
+
+class JSONFileSource(StatelessSource):
+    def __init__(self, path: Path):
+        self._f = open(path, "rt")
+
+    def next(self):
+        line = self._f.readline().rstrip("\n")
+        if len(line) <= 0:
+            raise StopIteration()
+        line = json.loads(line)
+        return line
+
+    def close(self):
+        self._f.close()
+
+
+class JSONFileInput(DynamicInput):
+    def __init__(self, path: Path):
+        self._path = path
+
+    def build(self, _worker_index, _worker_count):
+        return JSONFileSource(self._path)
+
+
 def key_off_user_id(event):
     return event["user_id"], event
 
@@ -19,7 +39,7 @@ def key_off_user_id(event):
 def build_state():
     return {"unpaid_order_ids": [], "paid_order_ids": []}
 
-  
+
 def joiner(state, event):
     e_type = event["type"]
     order_id = event["order_id"]
@@ -40,19 +60,12 @@ def format_output(user_id__joined_state):
     }
 
 
-def output_builder(worker_index, worker_count):
-    def output_handler(item):
-        line = json.dumps(item)
-        print(line)
-
-    return output_handler
-
 flow = Dataflow()
-flow.input("input", ManualInputConfig(input_builder))
+flow.input("input", JSONFileInput(Path("data/cart-join.json")))
 flow.map(key_off_user_id)
 flow.stateful_map("joiner", build_state, joiner)
 flow.map(format_output)
-flow.capture(ManualOutputConfig(output_builder))
+flow.output("out", StdOutput())
 
 if __name__ == "__main__":
-  run_main(flow)
+    run_main(flow, epoch_interval=timedelta(seconds=0))
