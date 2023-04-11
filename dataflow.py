@@ -1,53 +1,19 @@
-import json
-
-from pathlib import Path
-from datetime import timedelta
-
 from bytewax.dataflow import Dataflow
-from bytewax.inputs import PartitionedInput, StatefulSource
-from bytewax.connectors.stdio import StdOutput
-from bytewax.execution import run_main
-from bytewax.recovery import SqliteRecoveryConfig
-
-recovery_config = SqliteRecoveryConfig(".")
-
-
-class JSONFileSource(StatefulSource):
-    def __init__(self, path: Path, resume_state):
-        resume_offset = resume_state or 0
-        self._f = open(path, "rt")
-        self._f.seek(resume_offset)
-
-    def next(self):
-        line = self._f.readline().rstrip("\n")
-        if len(line) <= 0:
-            raise StopIteration()
-        if line.startswith("FAIL"):  # Fix the bug.
-            return
-        line = json.loads(line)
-        return line
-
-    def snapshot(self):
-        return self._f.tell()
-
-    def close(self):
-        self._f.close()
-
-
-class JSONFileInput(PartitionedInput):
-    def __init__(self, path: Path):
-        self._path = path
-
-    def list_parts(self):
-        return {str(self._path)}
-
-    def build_part(self, for_part, resume_state):
-        assert for_part == str(self._path), "Can't resume reading from different file"
-        return JSONFileSource(self._path, resume_state)
-
 
 flow = Dataflow()
-flow.input("input", JSONFileInput(Path("data/cart-join.json")))
+
+from bytewax.connectors.files import FileInput
+
+flow.input("input", FileInput("data/cart-join.json"))
+
+import json
+
+
+def deserialize(s):
+    return [json.loads(s)]
+
+
+flow.flat_map(deserialize)
 
 
 def key_off_user_id(event):
@@ -85,7 +51,7 @@ def format_output(user_id__joined_state):
 
 
 flow.map(format_output)
-flow.output("out", StdOutput())
 
-if __name__ == "__main__":
-    run_main(flow, epoch_interval=timedelta(seconds=0), recovery_config=recovery_config)
+from bytewax.connectors.stdio import StdOutput
+
+flow.output("output", StdOutput())
