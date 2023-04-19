@@ -38,8 +38,8 @@ bytewax==0.16.*
 ## Table of content
 
 - Resources
-- Step 1. Input
-- Step 2. Dataflow
+- Step 1. Dataflow
+- Step 2. Input
 - Step 3. Execution
 - Summary
 
@@ -71,9 +71,9 @@ Let's add that key field using the `user_id` field present in every event.
 
 https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L19-L23
 
-Now onto the join itself. Stateful map needs two functions: One that
-builds the initial, empty state whenever a new key is encountered,
-and one that combines new items into the state and emits a value downstream.
+Now onto the join itself. Stateful map needs two functions: a `builder` that
+creates the initial, empty state whenever a new key is encountered,
+and a `mapper` that combines new items into the existing state.
 
 Our builder function will create the initial dictionary to hold the relevant data.
 
