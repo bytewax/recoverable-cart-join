@@ -59,17 +59,17 @@ https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L1-L3
 
 In a production application you would most likely be using something like Kafka or Redpanda as the input source. In this example, we will use the `FileInput` source that reads from the file we created earlier and emits one line at a time into our dataflow.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L5-L7
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L5-L7
 
 Each of the lines in the file is a JSON encoded string. Let's add a step to decode our input into a Python dictionary.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L12-L16
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L9-L16
 
 Our plan is to use the `stateful_map` operator to perform the join between customers and orders. All stateful operators require their input data to be in the form of a `(key, value)` tuple so that Bytewax can ensure that all tems for a given `key` end up on the same worker.
 
 Let's add that key field using the `user_id` field present in every event.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L19-L23
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L19-L23
 
 Now onto the join itself. Stateful map needs two functions: a `builder` that
 creates the initial, empty state whenever a new key is encountered,
@@ -77,19 +77,19 @@ and a `mapper` that combines new items into the existing state.
 
 Our builder function will create the initial dictionary to hold the relevant data.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L26-L27
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L26-L27
 
 Now we need the join logic, which will return two values: the updated state and the item to emit downstream. Since we'd like to continuously be emitting the most updated join info, we'll return the updated state each time the joiner is called.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L30-L41
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L30-L41
 
 The items that stateful operators emit also have the relevant key still attached, so in this case we have `(user_id, joined_state)`. Let's format that into a dictionary for output.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L44-L53
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L44-L53
 
 Finally, capture this output and send it to STDOUT.
 
-https://github.com/bytewax/recoverable-cart-join/blob/main/dataflow.py#L55-L57
+https://github.com/bytewax/recoverable-cart-join/blob/fd4c2e1a368bffc46ea9d823a810c4a2c11770a3/dataflow.py#L55-L57
 
 ## Step 3. Execution
 
