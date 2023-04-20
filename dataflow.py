@@ -20,7 +20,7 @@ def fixed_deserialize(s):
         return [json.loads(s)]
 
 
-flow.flat_map(fixed_deserialize)
+flow.flat_map(deserialize)
 
 
 def key_off_user_id(event):

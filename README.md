@@ -12,8 +12,6 @@
 
 In this example, we're going to build a small online order fulfillment system. It will join two events within a stream: one event type containing customer orders and another containing successful payments. The dataflow will emit completed orders for each customer that have been paid.
 
-## ****Prerequisites****
-
 **Sample Data**
 
 Make a file named `data/cart-join.json` with the following data:
@@ -84,7 +82,7 @@ https://github.com/bytewax/recoverable-cart-join/blob/32ce594e8c3ce547c264ecbcbc
 
 The items that stateful operators emit also have the relevant key still attached, so in this case we have `(user_id, joined_state)`. Let's format that into a dictionary for output.
 
-https://github.com/bytewax/recoverable-cart-join/blob/32ce594e8c3ce547c264ecbcbcbc48d6b38c37bb/dataflow.py#L51-L57
+https://github.com/bytewax/recoverable-cart-join/blob/32ce594e8c3ce547c264ecbcbcbc48d6b38c37bb/dataflow.py#L51-L60
 
 Finally, capture this output and send it to STDOUT.
 
@@ -112,11 +110,11 @@ We've also built up very valuable state in our stateful map operator and we don'
 
 https://github.com/bytewax/recoverable-cart-join/blob/32ce594e8c3ce547c264ecbcbcbc48d6b38c37bb/dataflow.py#L16-L20
 
-If we change this line:
+If we change this line To use our "bugfixed" function, we can re-run the dataflow and finish processing the items in the file: 
 
 https://github.com/bytewax/recoverable-cart-join/blob/32ce594e8c3ce547c264ecbcbcbc48d6b38c37bb/dataflow.py#L23
 
-To use our "bugfixed" function, we can re-run the dataflow and finish processing the items in the file:
+Let's run our dataflow again:
 
 ``` bash
 > python -m bytewax.run dataflow --sqlite-directory . --epoch-interval 0
